@@ -6,6 +6,8 @@ import (
     "time"
 )
 
+const pipePath = "./pipe"
+
 func checkError(err error) {
     if err != nil {
         fmt.Println(err)
@@ -15,15 +17,18 @@ func checkError(err error) {
 
 func main() {
     args := os.Args[1:]
-    if len(args) != 1 {
-        fmt.Println("output file path must be specified.")
+    if len(args) < 1 {
+        fmt.Println("Some entries to output must be specified.")
         os.Exit(1)
     }
-    outFilePath := args[0]
-    outFile, err := os.OpenFile(outFilePath, os.O_WRONLY|os.O_SYNC, 0600)
+    outFile, err := os.OpenFile(pipePath, os.O_WRONLY|os.O_SYNC, 0600)
     checkError(err)
-    outFile.Write([]byte("this is a test\n"))
-    sleepDuration, err := time.ParseDuration("20s")
+    sleepDuration, err := time.ParseDuration("10s")
     checkError(err)
-    time.Sleep(sleepDuration)
+    for _, entry := range args {
+        outFile.Write([]byte(entry))
+        outFile.Write([]byte("\n"))
+        fmt.Println("wrote ", entry)
+        time.Sleep(sleepDuration)
+    }
 }
