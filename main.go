@@ -6,7 +6,7 @@ import (
     "time"
 )
 
-const pipePath = "./pipe"
+const pipePath = "/pipedir/pipe"
 
 func checkError(err error) {
     if err != nil {
@@ -21,8 +21,11 @@ func main() {
         fmt.Println("Some entries to output must be specified.")
         os.Exit(1)
     }
-    outFile, err := os.OpenFile(pipePath, os.O_WRONLY|os.O_SYNC, 0600)
+    fmt.Println("opening ", pipePath)
+    const openFlags = os.O_WRONLY|os.O_SYNC|os.O_APPEND
+    outFile, err := os.OpenFile(pipePath, openFlags , 0600)
     checkError(err)
+    defer outFile.Close()
     sleepDuration, err := time.ParseDuration("10s")
     checkError(err)
     for _, entry := range args {
